@@ -3,6 +3,8 @@
 #include <Adafruit_VS1053.h>
 #include <Adafruit_NeoPixel.h>
 
+#define DEBUG 0
+
 #define VS1053_RESET   -1     // VS1053 reset pin (not used!)
 #define VS1053_CS       6     // VS1053 chip select pin (output)
 #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
@@ -22,25 +24,25 @@ int howClose = 0;
 int currentUUID = 0;
 
 void setup() {
-  Serial.begin(115200);
+  if (DEBUG) Serial.begin(115200);
   
   // for nrf52840 with native usb
-  while (!Serial) { delay(1); }
+  if (DEBUG) while (!Serial) { delay(1); }
   delay(500);  
 
-  Serial.println("Lets go!");  
+  if (DEBUG) Serial.println("Lets go!");  
   
   if (!musicPlayer.begin()) { // initialise the music player
-    Serial.println("what");    
-    Serial.println(F("Couldn't find VS1053, do you have the right pins defined?"));
+    if (DEBUG) Serial.println("what");    
+    if (DEBUG) Serial.println(F("Couldn't find VS1053, do you have the right pins defined?"));
     while (1);
   }
-  Serial.println(F("VS1053 found"));
+  if (DEBUG) Serial.println(F("VS1053 found"));
 
   //musicPlayer.sineTest(0x44, 500);
   
   if (!SD.begin(CARDCS)) {
-    Serial.println(F("SD failed, or not present"));
+    if (DEBUG) Serial.println(F("SD failed, or not present"));
     while (1);  // don't do anything more
   }
 
@@ -63,7 +65,7 @@ void setup() {
 
 void loop() {
   
-  Serial.println("looping!");
+  if (DEBUG) Serial.println("looping!");
   int buttonPress = LOW;
 
   while (1) {
@@ -98,13 +100,13 @@ void loop() {
     buttonPress = digitalRead(PLAY_BUTTON);
     if (buttonPress == HIGH && howClose == 3) {
       if (musicPlayer.playingMusic) {
-        Serial.print("Stopping current Track.");
+        if (DEBUG) Serial.print("Stopping current Track.");
         musicPlayer.stopPlaying();
       }
       else {
         switch (currentUUID) {
           case 0:
-            Serial.print("Playing Station 1!");
+            if (DEBUG) Serial.print("Playing Station 1!");
             musicPlayer.startPlayingFile("/station1.mp3");
             break;
           default:
@@ -116,8 +118,8 @@ void loop() {
     }
     if (buttonPress == HIGH) {
       howClose++;
-      Serial.print("trying to play: ");
-      Serial.println(howClose);
+      if (DEBUG) Serial.print("trying to play: ");
+      if (DEBUG) Serial.println(howClose);
       delay(500);
     }
   }
@@ -136,16 +138,16 @@ void printDirectory(File dir, int numTabs) {
        break;
      }
      for (uint8_t i=0; i<numTabs; i++) {
-       Serial.print('\t');
+       if (DEBUG) Serial.print('\t');
      }
-     Serial.print(entry.name());
+     if (DEBUG) Serial.print(entry.name());
      if (entry.isDirectory()) {
-       Serial.println("/");
+       if (DEBUG) Serial.println("/");
        printDirectory(entry, numTabs+1);
      } else {
        // files have sizes, directories do not
-       Serial.print("\t\t");
-       Serial.println(entry.size(), DEC);
+       if (DEBUG) Serial.print("\t\t");
+       if (DEBUG) Serial.println(entry.size(), DEC);
      }
      entry.close();
    }
